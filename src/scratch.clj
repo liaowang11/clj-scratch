@@ -46,6 +46,11 @@
                                       :show-valid-values? true
                                       :theme :figwheel-theme}))
 
+(defn err->msg
+  "Helper to return an error message string from an exception."
+  [^Throwable e]
+  (-> e Throwable->map clojure.main/ex-triage clojure.main/ex-str))
+
 (defn repl-caught [e]
   (let [ex (clojure.main/repl-exception e)
         tr (.getStackTrace ex)
@@ -67,9 +72,7 @@
         :else
         ;; otherwise print exception
         (println (str (if (instance? clojure.lang.Compiler$CompilerException ex)
-                        (str
-                         (-> ex class .getSimpleName)
-                         " " (.getMessage ex) " ")
+                        (err->msg ex)
                         (str " " (if el
                                    (clojure.stacktrace/print-stack-trace ex)
                                    "[trace missing]")))))))))
